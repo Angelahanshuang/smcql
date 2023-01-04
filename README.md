@@ -98,30 +98,30 @@ The above files are an automated example for setting up the test databases and a
 
 
 --------------------------------------------------------------------------------
-Running the example queries on different machines
+在不同的机器上运行这个示例查询
 --------------------------------------------------------------------------------
-1. Create new configuration files for your remote hosts:
+1. 为远程主机创建新的配置文件：
 
 * conf/setup.remote
 * conf/connections/remote-hosts
 
-2. Ensure that you have three machines with direct ssh access to one another.
+2. 确保您有三台可直接访问彼此的机器。
 
-3. Populate two of the machines with your data, in their local PostgreSQL instances. These will be your two workers, so each will have their own data.
+3. 在两台计算机的本地 PostgreSQL 实例中填充您的数据。这些将是您的两个工作人员，因此每个人都有自己的数据。
 
-4. Make sure that both your workers have their schemas set correctly (as detailed in the previous section). Remember that the schemas, and security annotations, must be the same for both machines.
+4. 确保您的两个工作人员都正确地设置了他们的模式(如前一节所详细说明的)。请记住，架构和安全注释对于这两台机器必须是相同的。
 
-5. On the third machine (the honest broker), ensure that you have a copy of the repository and that the configuration files are populated with the correct worker configuration information.
+5. 在第三台计算机（诚实的经纪人）上，确保您拥有存储库的副本，并且配置文件填充了正确的Worker配置信息。
 
-6. Run the example command on the honest broker, from the SMCQL repository:
+6. 在诚实代理上从SMCQL存储库运行示例命令 Run the example command on the honest broker, from the SMCQL repository:
 
     `$ ./build_and_execute.sh conf/workload/sql/comorbidity.sql remoteDB1 remoteDB2`
 
 Notes:
 
-* Machine 1: Contains PostgreSQL database 'remoteDB1' and correct schema
-* Machine 2: Contains PostgreSQL database 'remoteDB2' and correct schema
-* Machine 3: Contains configuration files that specify the locations and connection information for 'remoteDB1' and 'remoteDB2'
+* Machine 1: 包含PostgreSQL数据库“remoteDB1”和正确的架构
+* Machine 2: 包含PostgreSQL数据库“remoteDB2”和正确的架构
+* Machine 3: 包含指定“ RemoteDB1”和“ RemoteDB2”的位置和连接信息的配置文件
 
 --------------------------------------------------------------------------------
 References
