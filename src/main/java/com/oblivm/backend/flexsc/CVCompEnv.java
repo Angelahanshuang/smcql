@@ -120,4 +120,16 @@ public class CVCompEnv extends BooleanCompEnv implements java.io.Serializable {
 	public boolean[] outputToBob(Boolean[] out) {
 		return Utils.tobooleanArray(out);
 	}
+
+	@Override
+	public boolean compare(Boolean a, Boolean b) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean compare(Boolean[] a, Boolean[] b) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

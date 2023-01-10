@@ -29,6 +29,7 @@ public class Cmd {
 	
 	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) throws Exception {
+		System.out.println("[CODE] Cmd.main");
 		ArgumentParser ap = ArgumentParsers.newArgumentParser("Cmd");
 		ap.addArgument("file").nargs("*").help("File to compile");
 		ap.addArgument("--config").setDefault("Config.conf").help("Config file");
@@ -57,6 +58,7 @@ public class Cmd {
 		int hbPort = Integer.parseInt(ns.getString("hp"));
 		String hbHost = ns.getString("hh");
 
+		System.out.println("[CODE]Cmd main type:" + ns.getString("type"));
 		if(ns.getString("type").equals("gen")) {
 			GenRunnable gen = new MainRunnable.Generator(ns.getString("class"), ns.getString("input"), hbHost, hbPort);
 			gen.loadConfig(ns.getString("config"));

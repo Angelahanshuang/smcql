@@ -40,10 +40,12 @@ public class RunnableSegment<T> implements Callable<SecureQueryTable>, Serializa
 	@SuppressWarnings("unchecked")
 	public Thread runIt() throws Exception {
 		if(segment.party == Party.Alice) {
+			System.out.println("Alice started");
     		genRunner = new SMCQLRunnable.Generator<T>(segment);
     		runnerThread = new Thread(genRunner);
         }
         else {
+			System.out.println("Bob started");
         	evaRunner = new SMCQLRunnable.Evaluator<T>(segment);
         	runnerThread = new Thread(evaRunner);
         }

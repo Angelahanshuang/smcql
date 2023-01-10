@@ -2,6 +2,7 @@ package org.smcql.executor.step;
 
 import java.util.List;
 
+import org.apache.calcite.util.ImmutableIntList;
 import org.smcql.codegen.CodeGenerator;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.executor.config.RunConfig;
@@ -9,8 +10,13 @@ import org.smcql.executor.smc.OperatorExecution;
 import org.smcql.plan.operator.Operator;
 
 public interface ExecutionStep {
-	 
-	
+	public String getWorkerId();
+	public void setWorkerId(String workerId);
+	public boolean getExecutable();
+	public void setExecutable(boolean executable);
+	public void setJoinId(List<String> joinId);
+	public List<String> getJoinId();
+
 	// generates a main method for smc
 	public String generate() throws Exception;
 		

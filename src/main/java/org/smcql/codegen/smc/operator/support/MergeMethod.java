@@ -31,7 +31,7 @@ public class MergeMethod implements CodeGenerator, Serializable {
 	private String srcSQL;
 	private SecureRelRecordType schema;
 	private List<SecureRelDataTypeField> orderKey;
-	ExecutionStep childStep;
+	public ExecutionStep childStep;
 	
 	public MergeMethod(Operator op, ExecutionStep child, List<SecureRelDataTypeField> orderBy) throws Exception{
 		src = op;
@@ -43,6 +43,7 @@ public class MergeMethod implements CodeGenerator, Serializable {
 		packageName = child.getPackageName() + ".merge";
 
 		if (srcSQL != null) {
+			System.out.println("[CODE]MergeMethod build schema");
 			schema = Utilities.getOutSchemaFromString(srcSQL);
 		} else {
 			schema = child.getSourceOperator().getSchema(true);
@@ -50,6 +51,7 @@ public class MergeMethod implements CodeGenerator, Serializable {
 	}
 	// for use in testing
 	public MergeMethod(String sql, String pack) throws Exception {
+		System.out.println("[CODE]MergeMethod from packageName");
 		packageName = pack;
 		srcSQL = sql;
 		orderKey = new ArrayList<SecureRelDataTypeField>();
@@ -74,7 +76,8 @@ public class MergeMethod implements CodeGenerator, Serializable {
 		variables.put("packageName", packageName);
 		
 		generatedCode = CodeGenUtils.generateFromTemplate("util/merge_inputs.txt", variables);
-	
+		if(Utilities.PRINT_GENCODE)
+			System.out.println("[GENCODE]MergeMethod generate:\n" + generatedCode);
 		return generatedCode;
 		
 	}

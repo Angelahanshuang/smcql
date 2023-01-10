@@ -15,7 +15,7 @@ public class OperatorFactory {
 	
 	public static Operator get(String name, SecureRelNode secNode, Operator ...children ) throws Exception {
 		RelNode node = secNode.getRelNode();
-		
+		System.out.println("[CODE]OperatorFactory::get node:" + node.getDescription());
 		if(node instanceof JdbcTableScan)
 			return new SeqScan(name, secNode, children);
 		

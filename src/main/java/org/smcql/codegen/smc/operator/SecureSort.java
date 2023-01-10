@@ -9,6 +9,7 @@ import org.smcql.plan.operator.Sort;
 import org.smcql.type.SecureRelDataTypeField;
 import org.smcql.type.TypeMap;
 import org.smcql.util.CodeGenUtils;
+import org.smcql.util.Utilities;
 
 public class SecureSort extends SecureOperator {
 
@@ -110,6 +111,8 @@ public class SecureSort extends SecureOperator {
 		// plain sort
 		if(planNode.getSchema().getSecureFieldList().equals(sortKey)) {
 			generatedCode =  CodeGenUtils.generateFromTemplate("sort/simple.txt", variables);
+			if(Utilities.PRINT_GENCODE)
+				System.out.println("[GENCODE]SecureSort generate plain sort:\n" + generatedCode);
 			return generatedCode;
 		}
 
@@ -125,8 +128,9 @@ public class SecureSort extends SecureOperator {
 		String srcFile = "sort/keyed.txt";
 		
 		generatedCode = CodeGenUtils.generateFromTemplate(srcFile, variables);
+		if(Utilities.PRINT_GENCODE)
+			System.out.println("[GENCODE]SecureSort generate:\n" + generatedCode);
 		return generatedCode;
-		
 	}
 	
 }

@@ -20,8 +20,9 @@ public class Client extends Network {
 				try {
 					sock = new java.net.Socket(server, port); // create socket and
 					// connect
-					if (sock != null)
+					if (sock != null){
 						break;
+					}
 				} catch(IOException e){
 					Thread.sleep(10);
 				}

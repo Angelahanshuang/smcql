@@ -139,4 +139,16 @@ public class PMCompEnv extends BooleanCompEnv {
 		statistic.bandwidth += 10 * 2 * (80 + in.length);
 		return Utils.toBooleanArray(in);
 	}
+
+	@Override
+	public boolean compare(Boolean a, Boolean b) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean compare(Boolean[] a, Boolean[] b) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

@@ -3,6 +3,8 @@
  */
 package com.oblivm.compiler.cmd;
 
+import org.smcql.util.Utilities;
+
 import com.oblivm.compiler.ast.ASTProgram;
 import com.oblivm.compiler.backend.ICodeGenerator;
 import com.oblivm.compiler.frontend.IFrontEndCompiler;
@@ -37,6 +39,8 @@ public class Cmd {
 		ASTProgram prog = CParser.parse(srcFile);
 		TypeManager tm = fc.compile(prog);
 
+		if(Utilities.PRINT_GENCODE)
+			System.out.println("[GENCODE]Cmd compile:" + prog.packageName);
 		cg.codeGen(tm, prog.packageName, ".", false, 54321, "localhost");
 		//Info.LOG.log("Compiling " + srcFile + " succeeds");	
 	}

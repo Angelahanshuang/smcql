@@ -69,25 +69,24 @@ public class SqlQueryExecutor {
 	}
 	
 	public static QueryTable query(String sql, String workerId) throws Exception {
+		System.out.println("[CODE]SqlQueryExecutor query");
 		SecureRelRecordType outSchema = Utilities.getOutSchemaFromString(sql);
-
 		SegmentExecutor executor = SegmentExecutor.getInstance();
 		return executor.runPlaintext(workerId, sql, outSchema);
-
-		
 	}
 	
 	
 	public static QueryTable query(String sql, SecureRelRecordType outSchema, String workerId) throws Exception {
 		Logger logger = SystemConfiguration.getInstance().getLogger();
 		double start = System.nanoTime();
-		logger.info("Starting query");
+		//logger.info("Starting query");
+		System.out.println("[CODE]query:\n" + sql);
 		Connection c = ConnectionManager.getInstance().getConnection(workerId);
 		QueryTable result = query(outSchema, sql, c);
 		double end = System.nanoTime();
 		double elapsed = (end - start) / 1e9;
-		logger.info("Finished running in " + elapsed + " seconds.");
-		
+		//logger.info("Finished running in " + elapsed + " seconds.");
+		System.out.println("[CODE]result:\n" + result);
 		return result;
 		
 	}

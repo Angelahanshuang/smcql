@@ -16,7 +16,7 @@ public abstract class GenRunnable<T> extends com.oblivm.backend.network.Server i
 	protected Mode m;
 	protected int port;
 	protected String[] args;
-	public boolean verbose = false;
+	public boolean verbose = true;
 	public void setParameter(Mode m, int port, String[] args) {
 		this.m = m;
 		this.port = port;
@@ -39,7 +39,7 @@ public abstract class GenRunnable<T> extends com.oblivm.backend.network.Server i
 			double e = 0;
 			try {
 				 if(verbose)
-					System.out.println("connecting");
+					System.out.println("connecting listen:" + String.valueOf(port));
 	            listen(port);
 	            if(verbose)
 	            	System.out.println("connected");
@@ -49,11 +49,13 @@ public abstract class GenRunnable<T> extends com.oblivm.backend.network.Server i
 	            Flag.sw.startTotal();
 		         
 	            s = System.nanoTime();
+				System.out.println("[CODE]GenRunnable prepareInput");
 	            prepareInput(env);
 	            os.flush();
+				System.out.println("[CODE]GenRunnable secureCompute");
 	            secureCompute(env);
 	            os.flush();
-	            
+	            System.out.println("[CODE]GenRunnable prepareOutput");
 	            result = prepareOutput(env);
 	            os.flush();
 	            Flag.sw.stopTotal();

@@ -13,6 +13,7 @@ public class StatisticsCollector {
 	
 	// performed once per secure leaf
 	public static SliceStatistics collect(SliceKeyDefinition s) throws Exception {	
+		System.out.println("[CODE]StatisticsCollector collect");
 		SecureRelDataTypeField keyField = s.getAttributes().get(0);		
 		String attribute = keyField.getStoredAttribute();
 		

@@ -82,10 +82,12 @@ public class BasicSecureQueryTable implements SecureQueryTable, Serializable {
 		
 		if(party == Party.Bob) {
 			BasicSecureQueryTable aTable = (BasicSecureQueryTable) other;
+			System.out.println("[CODE]BasicSecureQueryTable declassify Bob:" + aTable);
 			output = SecureOutputReader.assembleOutput(aTable, this, schema);
 		}
 		else {
 			BasicSecureQueryTable bTable = (BasicSecureQueryTable) other;
+			System.out.println("[CODE]BasicSecureQueryTable declassify Alice:" + bTable);
 			output = SecureOutputReader.assembleOutput(this, bTable, schema);
 		}
 		

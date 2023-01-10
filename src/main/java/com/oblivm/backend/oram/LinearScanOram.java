@@ -81,4 +81,15 @@ public class LinearScanOram<T> implements java.io.Serializable {
 	public void putBack(T[] scIden, T[] scData) {
 		add(scIden, scData);
 	}
+
+	@Override
+	public String toString(){
+		int contents = 0;
+		for(T[] c: content){
+			if(!env.compare(c, lib.zeros(dataSize))){
+				contents++;
+			}
+		}
+		return String.format("LinearScanOram(%d)", contents);
+	} 
 }

@@ -10,6 +10,7 @@ import org.smcql.type.SecureRelDataTypeField;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.plan.operator.Aggregate;
 import org.smcql.util.CodeGenUtils;
+import org.smcql.util.Utilities;
 
 public class SecureAggregate extends SecureOperator {
 
@@ -33,7 +34,10 @@ public class SecureAggregate extends SecureOperator {
 		
 		List<SecureRelDataTypeField> groupByAttributes = a.getGroupByAttributes();
 		if (groupByAttributes.isEmpty()) {
-			return CodeGenUtils.generateFromTemplate("aggregate/singular/full/count.txt", variables);
+			generatedCode = CodeGenUtils.generateFromTemplate("aggregate/singular/full/count.txt", variables);
+			if(Utilities.PRINT_GENCODE)
+				System.out.println("[GENCODE]SecureAggregate generate groupBy:\n" + generatedCode);
+			return generatedCode;
 		} 
 		
 		String groupByMatch = generateGroupBy(groupByAttributes);
@@ -45,6 +49,8 @@ public class SecureAggregate extends SecureOperator {
 		variables.put("cntMask", cntMask);
 	
 		generatedCode = CodeGenUtils.generateFromTemplate("aggregate/groupby/partial/count.txt", variables);
+		if(Utilities.PRINT_GENCODE)
+			System.out.println("[GENCODE]SecureAggregate generate:\n" + generatedCode);
 		return generatedCode;
 	}
 	

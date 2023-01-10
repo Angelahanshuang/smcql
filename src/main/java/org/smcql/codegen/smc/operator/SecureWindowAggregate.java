@@ -13,6 +13,7 @@ import org.smcql.plan.operator.WindowAggregate;
 import org.smcql.type.SecureRelDataTypeField;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.util.CodeGenUtils;
+import org.smcql.util.Utilities;
 
 // only supports row number for now
 public class SecureWindowAggregate extends SecureOperator  {
@@ -80,7 +81,8 @@ public class SecureWindowAggregate extends SecureOperator  {
 		else {
 			generatedCode = CodeGenUtils.generateFromTemplate("windowAggregate/singular/row_num.txt", variables);
 		}
-	
+		if(Utilities.PRINT_GENCODE)
+			System.out.println("[GENCODE]SecureWindowAggregate generate:\n" + generatedCode);
 		return generatedCode;
 		
 	}

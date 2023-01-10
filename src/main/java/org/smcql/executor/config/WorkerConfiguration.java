@@ -71,7 +71,7 @@ public class WorkerConfiguration  {
 			Class.forName("org.postgresql.Driver");
 			String url = "jdbc:postgresql://" + hostname + ":" + dbPort + "/" + dbName;
 			Properties props = new Properties();
-	
+			System.out.println(url + " user:" + user);
 			props.setProperty("user", user);
 			props.setProperty("password",password);
 			dbConnection = DriverManager.getConnection(url, props);

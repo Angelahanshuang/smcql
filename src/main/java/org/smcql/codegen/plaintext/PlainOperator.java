@@ -160,6 +160,7 @@ public class PlainOperator implements CodeGenerator {
 	}
 	
 	public void inferSlicePredicates(SliceKeyDefinition def) throws Exception {
+		System.out.println("[CODE]PlainOperator inferSlicePredicates " + planNode.getExecutionMode());
 		if(planNode.getExecutionMode() == ExecutionMode.Slice) {
 			SliceStatistics stats = StatisticsCollector.collect(def);
 			sliceValues = new ArrayList<Tuple>(stats.getDistributedValues().keySet());

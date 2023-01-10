@@ -10,8 +10,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
+
+import org.smcql.type.SecureRelRecordType;
 
 import com.oblivm.backend.flexsc.CompEnv;
+import com.oblivm.backend.flexsc.Party;
 import com.oblivm.backend.gc.BadLabelException;
 
 public class SecureArray<T> implements java.io.Serializable {
@@ -27,10 +31,20 @@ public class SecureArray<T> implements java.io.Serializable {
 	boolean useTrivialOram = false;
 	public LinearScanOram<T> trivialOram = null;
 	public RecursiveCircuitOram<T> circuitOram = null;
-	public int lengthOfIden;
-	public int length;
-	public int dataSize;
+	public int lengthOfIden = 0;
+	public int length = 0;
+	public int dataSize = 0;
 	protected T[] nonNullEntries; // number of entries in array that are initialized
+	//PSI
+	public boolean isPlain = false;
+	public boolean isLhs = false;
+	public String tableName = "";
+	public Party party = null;
+	public List<String> joinId = null;
+	public SecureRelRecordType schema = null;
+	//MPC
+	public String fileName = null;
+	public String operatorName = null;
 	
 	public SecureArray() {
 		// needed for serialization
@@ -66,6 +80,12 @@ public class SecureArray<T> implements java.io.Serializable {
 			trivialOram.write(iden, data);
 		else
 			circuitOram.write(iden, data);
+	}
+
+	@Override
+	public String toString(){
+		//return String.format("SecureArray(%d)", length);
+		return "SecureArray:" + (useTrivialOram ? trivialOram.toString() : circuitOram.toString());
 	}
 	
 	public void conditionalWrite(T[] iden, T[]data, T condition) throws BadLabelException {

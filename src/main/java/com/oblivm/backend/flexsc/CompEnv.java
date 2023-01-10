@@ -82,6 +82,9 @@ public abstract class CompEnv<T> implements java.io.Serializable{
 	public abstract T[] inputOfAlice(boolean[] in);
 
 	public abstract T[] inputOfBob(boolean[] in);
+
+	public abstract boolean compare(T a, T b);
+	public abstract boolean compare(T[] a, T[] b);
 	
 	public T[][] inputOfAlice(boolean[][] in) {
 		boolean[] flattened = Utils.flatten(in);

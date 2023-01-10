@@ -49,7 +49,9 @@ import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.rel.rules.*;
 
 
-// parse and validate a sql statement against a schema
+/**
+ * 解析和验证针对某个模式的SQL语句 parse and validate a sql statement against a schema
+ */
 public class SqlStatementParser {
 	
 	SchemaPlus sharedSchema;
@@ -60,14 +62,14 @@ public class SqlStatementParser {
 	
 	
 	public SqlStatementParser() throws Exception {
-		SystemConfiguration pdnConfig = SystemConfiguration.getInstance();
+		SystemConfiguration pdnConfig = SystemConfiguration.getInstance();//根据配置文件获取了诚实代理的地址、（初始化了calcite的connect、schema、parser）
 		config = pdnConfig.getCalciteConfiguration();
 		calciteConnection = pdnConfig.getCalciteConnection();
 		sharedSchema = pdnConfig.getPdnSchema();
 		
 		planner = new PlannerImpl(config);
 		 
-		// configure optimizer
+		// 配置优化器
 		   HepProgramBuilder builder = new HepProgramBuilder();
 		  
 		    builder.addRuleClass(ReduceExpressionsRule.class);
@@ -130,7 +132,7 @@ public class SqlStatementParser {
 		return config;
 	}
 	
-	
+	// 用于最小化每个RelNode上的字段的方法，这减少了运行SqlToRelTestBase的许多运算符泛化所需的权限
 	// method for minimizing the fields at each RelNode 
 	// this reduces the permissions we need to run many operators
 	// generalization of SqlToRelTestBase
@@ -150,7 +152,7 @@ public class SqlStatementParser {
 	          
 	      final SqlValidator validator = new LocalValidatorImpl(config.getOperatorTable(), catalogReader, typeFactory,
 	              conformance());
-	      validator.setIdentifierExpansion(true);
+	      validator.setIdentifierExpansion(true);//启用或禁用列引用以外的标识符扩展。
 	      
 	      final SqlToRelConverter converter =
 	          createSqlToRelConverter(
@@ -159,9 +161,9 @@ public class SqlStatementParser {
 	              typeFactory);
 	      
 	      converter.setTrimUnusedFields(true);
-	      final SqlNode validatedQuery = validator.validate(sqlQuery);
+	      final SqlNode validatedQuery = validator.validate(sqlQuery);//校验器校验SQL语法
 	      RelRoot root =
-	          converter.convertQuery(validatedQuery, false, true);
+	          converter.convertQuery(validatedQuery, false, true);// SqlNode -> RelNode
 	      assert(root != null);
 	      converter.setTrimUnusedFields(true);
 	      root = root.withRel(converter.trimUnusedFields(true, root.rel));
@@ -169,7 +171,7 @@ public class SqlStatementParser {
 	    }
 
 	
-	  // from PlannerImpl, here b/c of protected method
+	  // 来自PlannerImpl，这里是受保护方法的b/c。 from PlannerImpl, here b/c of protected method
 	  private SqlConformance conformance() {
 		    final Context context = config.getContext();
 		    if (context != null) {
@@ -183,8 +185,7 @@ public class SqlStatementParser {
 		  }
 
 	  
-	// use optimizer to get operators into a canonical form
-	// very basic optimizer
+	// 使用优化器将操作符转换为规范形式的非常基本的优化器
 	public RelRoot optimize(RelRoot relRoot) {
 		
 		     optimizer.setRoot(relRoot.project());

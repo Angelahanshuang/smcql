@@ -7,13 +7,14 @@ import org.smcql.db.data.Tuple;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.executor.config.RunConfig;
 import org.smcql.executor.config.RunConfig.ExecutionMode;
+import org.smcql.executor.step.ExecutionStep;
 import org.smcql.plan.slice.SliceKeyDefinition;
 
 import com.oblivm.backend.flexsc.Party;
 
-// sequence of generated operators for execution (no sync points with other ops / hosts)
+// 生成的执行运算符operator序列（与其他操作/主机没有同步点）
 public class ExecutionSegment implements Serializable {
-
+	public ExecutionStep exeStep;
 	public OperatorExecution rootNode;
 	
 	public SliceKeyDefinition sliceSpec;
@@ -72,8 +73,10 @@ public class ExecutionSegment implements Serializable {
 		op.output = null;
 		resetOutputHelper(op.lhsChild);
 		resetOutputHelper(op.rhsChild);
-
-		
 	}
-	
+
+	@Override
+	public String toString() {
+		return rootNode.toString();
+	}
 }

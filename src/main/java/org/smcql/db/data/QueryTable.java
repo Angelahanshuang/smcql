@@ -68,6 +68,13 @@ public class QueryTable implements Serializable {
 		
 	}
 
+	public void addTuple(Tuple t) {
+		if(t == null) 
+			return;
+		tuples.add(t);
+		tupleCount++;
+	}
+	
 	public void addTuples(QueryTable src) {
 		if(src == null) 
 			return;
@@ -77,7 +84,7 @@ public class QueryTable implements Serializable {
 		}
  
 	}
-	
+
 	// compare outputs by sorting them first
 	public void sort() {
 		Collections.sort(tuples);

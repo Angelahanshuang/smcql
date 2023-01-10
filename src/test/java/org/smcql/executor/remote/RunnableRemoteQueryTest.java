@@ -96,7 +96,7 @@ public class RunnableRemoteQueryTest extends BaseTest {
 		logger.log(Level.INFO, "Segment has out schema " + segment.outSchema);
 		logger.log(Level.INFO, "Have segment count " + segments.size());
 		
-		SMCQLQueryExecutor exec = new SMCQLQueryExecutor(qc, aWorkerId, bWorkerId);
+		SMCQLQueryExecutor exec = new SMCQLQueryExecutor(qc, aWorkerId, bWorkerId, false);
 		exec.run();
 		
 	    QueryTable results = exec.getOutput();

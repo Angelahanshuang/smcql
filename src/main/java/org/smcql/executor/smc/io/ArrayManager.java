@@ -6,6 +6,7 @@ import com.oblivm.backend.gc.GCGenComp;
 import com.oblivm.backend.gc.GCSignal;
 import com.oblivm.backend.lang.inter.Util;
 import com.oblivm.backend.oram.SecureArray;
+
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.LinkedHashMap;
@@ -47,24 +48,21 @@ public class ArrayManager<T> implements Serializable {
 	
 	@SuppressWarnings("unchecked")
 	public SecureArray<T> getInput(OperatorExecution op, boolean isLhs, CompEnv<T> env, SMCRunnable parent) throws Exception {
-	
 		if(op == null)
 			return null;
-
 		OperatorExecution src = (isLhs) ? op.lhsChild : op.rhsChild;
 		Party party = op.getParty();
 		String workerId = op.getWorkerId();
+		System.out.println("[CODE]ArrayManager getInput from:" + op.packageName + " isLhs=" + isLhs + " party=" + party);
 		
 		if(op.parentSegment != parent.getSegment()) {
 			//throw new Exception("Mismatched operator " + op);
 		}
-		
 	
 		// local intermediate result
 		if(inputArrays.containsKey(src)){
 			return inputArrays.get(src);
 		}
-		
 		
 		if(src != null) {
 			if(Utilities.isCTE(src)) {
@@ -82,25 +80,61 @@ public class ArrayManager<T> implements Serializable {
 		
 		if(op.getSourceSQL() != null) {
 			if((isLhs && party == Party.Alice) || (!isLhs && party == Party.Bob)) {
-				return prepareLocalPlainData(op, env, parent);
+				//Local plain query
+				if(Utilities.SYSCMD_PSI_MPC){
+					//DO PSI, save plain query data only
+					SecureArray<T> secArray = new SecureArray<T>();
+					secArray.isPlain = true;
+					secArray.isLhs = isLhs;
+					secArray.joinId = op.joinId;
+					secArray.party = party;
+					QueryTable plainTable = op.executable ? queryIt(op) : null;
+					secArray.length = op.executable ? plainTable.tupleCount() : 0;
+					secArray.tableName = op.outSchema.getAttributes().get(0).getStoredTable();
+					secArray.schema = plainTable == null ? null : plainTable.getSchema();
+					SMCUtils.getFileName(secArray);
+					if(secArray.length > 0){
+						if(!SMCUtils.saveTable(plainTable, secArray.fileName)){
+							throw new Exception("Error: failed to save file " + secArray.fileName);
+						}
+					}else{
+						SMCUtils.saveAsEmptyFile(secArray.fileName);
+					}
+					System.out.println("[CODE]ArrayManager getInput PSI query plain executable[" + op.executable + "] file[" + secArray.fileName + "]");
+					return secArray;
+				}else{
+					//prepare local
+					System.out.println("[CODE]ArrayManager getInput prepareLocalPlainArray");
+					if(op.executable){
+						QueryTable table = queryIt(op);
+						return SMCUtils.prepareLocalPlainArray(table, env, parent);
+					}else{
+						return SMCUtils.prepareLocalPlainArray(null, env, parent);
+					}
+				}
+			}else {
+				//remote
+				if(Utilities.SYSCMD_PSI_MPC){
+					SecureArray<T> secArray = new SecureArray<T>();
+					secArray.isPlain = true;
+					secArray.isLhs = isLhs;
+					secArray.joinId = op.joinId;
+					secArray.party = party;
+					secArray.tableName = "discard";
+					SMCUtils.getFileName(secArray);
+					System.out.println("[CODE]ArrayManager getInput PSI remote file[" + secArray.fileName + "]");
+					return secArray;
+				}else{
+					// retrieve local half of shared secret for Bob's input
+					System.out.println("[CODE]ArrayManager getInput prepareRemotePlainArray");
+					return SMCUtils.prepareRemotePlainArray(env, parent);
+				}
 			}
-			else {
-				// retrieve local half of shared secret for Bob's input
-		
-				return SMCUtils.prepareRemotePlainArray(env, parent);
-
-			}
-
+		}else{
+			System.out.println("[CODE]ArrayManager getInput op has no SourceSQL");
 		}
-		
-		
-
-	return null;
-
+		return null;
 	}
-	
-	
-
 
 	public SlicedSecureQueryTable getSliceInputs(OperatorExecution op,  CompEnv<T> env, SMCRunnable parent, boolean isLhs) throws Exception {
 		if(op == null)
@@ -204,32 +238,27 @@ public class ArrayManager<T> implements Serializable {
 		return false;
 	}
 	
-
-
-
-	public SecureArray<T> prepareLocalPlainData(OperatorExecution o, CompEnv<T> env, SMCRunnable parent) throws Exception {
-		QueryTable table = queryIt(o);
-		return SMCUtils.prepareLocalPlainArray(table, env, parent);
-	}
-	
 	private QueryTable queryIt(OperatorExecution op) throws Exception {
 		ConnectionManager cm = ConnectionManager.getInstance();
         Connection c = cm.getConnection(op.getWorkerId());
         double start = System.nanoTime();
-        logger.info("For operator " + op.packageName + ", running plaintext query: " + op.getSourceSQL());
-        
+        //logger.info(op.getWorkerId() + ": For operator " + op.packageName + ", running plaintext query:\n" + op.getSourceSQL());
+        System.out.println("[CODE]ArrayManager queryIt:" + op.packageName + ", plaintext query:\n" + op.getSourceSQL());
+
         QueryTable tupleData = SqlQueryExecutor.query(op.outSchema, op.getSourceSQL(), c);	
         
         String limitStr = SystemConfiguration.getInstance().getProperty("truncate-input");
         if(limitStr != null) {
         	int limit = Integer.parseInt(limitStr);
-        	logger.info("Truncating to " + limit + " tuples.");
+        	//logger.info("Truncating to " + limit + " tuples.");
         	//  for testing
         	tupleData.truncateData(limit);
         }
         double end = System.nanoTime();
 		double elapsed = (end - start) / 1e9;
-		logger.info("Finished running plaintext for operator " + op.packageName + " in " + elapsed + " seconds.");
+		//logger.info("Finished running plaintext for operator " + op.packageName + " in " + elapsed + " seconds.");
+		if(tupleData.tupleCount() < 20)
+			System.out.println("[CODE]ArrayManager query result:\n" + tupleData);
         return tupleData;
 
 	}

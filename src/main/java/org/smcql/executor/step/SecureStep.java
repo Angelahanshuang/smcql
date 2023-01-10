@@ -4,11 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.calcite.util.ImmutableIntList;
 import org.smcql.codegen.CodeGenerator;
 import org.smcql.codegen.smc.operator.support.MergeMethod;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.executor.config.RunConfig;
 import org.smcql.executor.smc.OperatorExecution;
+import org.smcql.plan.operator.Join;
 import org.smcql.plan.operator.Operator;
 
 public class SecureStep implements ExecutionStep, Serializable {
@@ -19,15 +21,18 @@ public class SecureStep implements ExecutionStep, Serializable {
 	List<ExecutionStep> children;
 	RunConfig runConf;
 	boolean visited = false;
+	String workerId;
 	
 	// hold on to state for serialization 
 	boolean isMerge = false;
 	OperatorExecution exec;
+	boolean executable = true;
 	
 	public SecureStep(CodeGenerator cg, Operator op, RunConfig r, ExecutionStep lhsChild, ExecutionStep rhsChild) throws Exception {
 		codeGenerator = cg;
 		srcOperator = op;
 		runConf = r;
+		executable = lhsChild.getExecutable();
 		
 		children = new ArrayList<ExecutionStep>();
 		children.add(lhsChild);
@@ -35,16 +40,47 @@ public class SecureStep implements ExecutionStep, Serializable {
 			children.add(rhsChild);
 		
 		exec = new OperatorExecution(this);
-
 		
 		// needed to avoid serializing whole code generator
 		if(cg instanceof MergeMethod)  {
 			isMerge = true;
 			exec.setSourceSQL(((MergeMethod) cg).getSourceSQL());
+
+			MergeMethod merge = (MergeMethod)cg;
+			exec.joinId = merge.childStep.getJoinId();
+		}
+		if(op instanceof Join){
+			exec.isJoin = true;
+			exec.joinId = ((Join)op).joinId;
 		}
 	}
 	
+	@Override
+	public void setJoinId(List<String> joinId) {
+		exec.joinId = joinId;
+		System.out.println("[CODE]PlaintextStep joinId:" + exec.joinId);
+	}
+	@Override
+	public List<String> getJoinId() {
+		return exec.joinId;
+	}
 	
+	@Override
+	public String getWorkerId(){
+		return workerId;
+	}
+	@Override
+	public void setWorkerId(String workerId){
+		this.workerId = workerId;
+	}
+	@Override
+	public boolean getExecutable(){
+		return executable;
+	}
+	public void setExecutable(boolean executable){
+		this.executable = executable;
+	}
+
 	@Override
 	public String generate() throws Exception {
 		return codeGenerator.generate();
@@ -135,12 +171,15 @@ public class SecureStep implements ExecutionStep, Serializable {
 	public String printTree() {
 		return appendOperator(this, new String(), "");
 	}
-	
+
+	private String getPackageClassName(String fullname){
+		return fullname.substring(fullname.lastIndexOf(".") + 1);
+	}	
 	private String appendOperator(ExecutionStep step, String src, String linePrefix) {
 		String opString = step.getSourceOperator().toString();
 		if (step instanceof SecureStep && ((SecureStep) step).isMerge)
-			opString = "LogicalMerge-Secure";
-		src += linePrefix + opString + "\n";
+			opString = "LogicalMerge(Secure, " + getPackageClassName(step.getSourceOperator().getPackageName()) + ")";
+		src += linePrefix + opString + ", Executable:" + step.getExecutable() + "\n";
 		linePrefix += "    ";
 		for(ExecutionStep child : step.getChildren()) {
 			src = appendOperator(child, src, linePrefix);

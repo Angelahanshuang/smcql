@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.calcite.plan.RelOptUtil;
 import org.apache.calcite.rel.RelNode;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.smcql.codegen.CodeGenerator;
@@ -22,9 +23,9 @@ import org.smcql.util.RelNodeMatcher;
 import org.smcql.util.Utilities;
 
 
-// for execution mode planning over a RelNode
+// 用于在 RelNode 上进行执行模式规划
 public abstract class Operator implements CodeGenerator {
-	
+	public String workerId;
 	protected SecureRelNode baseRelNode;
 	protected ShadowRelNode unoptimizedRelNode = null;
 	private SecureOperator secureOperator;
@@ -73,33 +74,27 @@ public abstract class Operator implements CodeGenerator {
 	public void inferExecutionMode() {
 		for(Operator op : children) {
 			op.inferExecutionMode();
-			
+
 		}
 		
 		ExecutionMode maxChild = maxChildMode(); 
 		SecurityPolicy maxAccess = maxAccessLevel(); // most sensitive thing it computes on
 		List<SecureRelDataTypeField> sliceAttrs = getSliceAttributes();
 		
-		String msg = "For " + baseRelNode.getRelNode().getRelTypeName() + " have max child " + maxChild + " and max access " + maxAccess + " slice key " + sliceAttrs;
+		String msg = "For " + baseRelNode.getRelNode().getRelTypeName() + " have max child [" + maxChild + "] and max access [" + maxAccess + "] slice key " + sliceAttrs;
 		logger.log(Level.FINE, msg);
 
 		if(maxChild.compareTo(ExecutionMode.Plain) <= 0 && maxAccess == SecurityPolicy.Public) {
 			executionMode = ExecutionMode.Plain;
 			return;
 		}
-
-
 		
-		
-		
-		if(maxChild.compareTo(ExecutionMode.Plain) <= 0 & !sliceAttrs.isEmpty()) {
+		if(maxChild.compareTo(ExecutionMode.Plain) <= 0 && !sliceAttrs.isEmpty()) {
 			executionMode = ExecutionMode.Slice;
 			sliceKey = new SliceKeyDefinition(sliceAttrs);
 			sliceKey.addFilters(sliceAttrs.get(0).getFilters(), this.getSchema());
 			return;
 		}
-		
-		
 		
 		if(maxChild == ExecutionMode.Slice) {
 			boolean sliceAble = true;
@@ -107,7 +102,6 @@ public abstract class Operator implements CodeGenerator {
 				if(!SliceKeyDefinition.sliceCompatible(op, this)) {
 					sliceAble = false;
 				}
-			
 			}
 		
 			if(sliceAble) {
@@ -120,10 +114,7 @@ public abstract class Operator implements CodeGenerator {
 				return;
 			}
 		}
-		
 		// secure mode default
-		
-		
 	}
 	
 		
@@ -217,10 +208,14 @@ public abstract class Operator implements CodeGenerator {
 	}
 	
 	
+	private String getPackageClassName(String fullname){
+		return fullname.substring(fullname.lastIndexOf(".") + 1);
+	}	
 	
 	public String toString() {
-		
-		String ret = baseRelNode.getRelNode().getRelTypeName() + "-" + executionMode + ", schema:" + getSchema();
+		//String ret = baseRelNode.getRelNode().getRelTypeName() + "(" + executionMode + ", " + getPackageClassName(getPackageName()) + "), schema:" + getSchema();
+		String schema = getSchema().getAttributes().get(0).getStoredTable() == null ? ("), schema:" + getSchema()) : ("), table:" + getSchema().getAttributes().get(0).getStoredTable());
+		String ret = baseRelNode.getRelNode().getRelTypeName() + "(" + executionMode + ", " + getPackageClassName(getPackageName()) + schema;
 		List<SecureRelDataTypeField> sliceAttrs = this.getSliceAttributes();
 		if(!sliceAttrs.isEmpty())
 			ret += ", slice key: " + sliceAttrs;
@@ -305,7 +300,7 @@ public abstract class Operator implements CodeGenerator {
 
 	// if a SMC operator implementation leverages the order of tuples for comparisons, codify that in this function
 	// otherwise empty set = order agnostic
-	// order is implicitly ascending
+	// order is implicitly ascending 如果SMC运算符实现利用元组的顺序进行比较，请在此函数中对其进行编码，否则空集合=顺序不可知的顺序将隐式递增
 	public List<SecureRelDataTypeField> secureComputeOrder() {
 		return new ArrayList<SecureRelDataTypeField>();
 	}

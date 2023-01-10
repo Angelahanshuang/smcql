@@ -16,6 +16,8 @@ import org.smcql.plan.operator.Operator;
 import org.smcql.type.SecureRelDataTypeField;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.util.CodeGenUtils;
+import org.smcql.util.Utilities;
+
 import net.sf.jsqlparser.JSQLParserException;
 
 public class SecureJoin extends SecureOperator{
@@ -44,9 +46,13 @@ public class SecureJoin extends SecureOperator{
 				
 		if(join.getCondition() == null) {
 			generatedCode =  CodeGenUtils.generateFromTemplate("join/cross.txt", variables);	
+			if(Utilities.PRINT_GENCODE)
+				System.out.println("[GENCODE]SecureJoin generate cross:\n" + generatedCode);
 		}
 		else {	
 			generatedCode =  CodeGenUtils.generateFromTemplate("join/simple.txt", variables);
+			if(Utilities.PRINT_GENCODE)
+				System.out.println("[GENCODE]SecureJoin generate simple:\n" + generatedCode);
 		}
 		return generatedCode;
 		

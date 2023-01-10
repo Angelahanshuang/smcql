@@ -38,4 +38,37 @@ public abstract class GCCompEnv extends CompEnv<GCSignal> {
 	public GCSignal newT(boolean v) {
 		return new GCSignal(v);
 	}
+
+	public void print(String msg, GCSignal in){
+		System.out.println(msg + (in.isPublic() ? in.v : "value"));
+	}
+
+	public boolean compare(GCSignal a, GCSignal b){
+		if (a.isPublic() && b.isPublic())
+			return a.v == b.v;
+		else if (a.isPublic())
+			return false;
+		else if (b.isPublic())
+			return false;
+		else {
+			if(a.bytes.length != b.bytes.length)
+				return false;
+			boolean eq = true;
+			for(int i = 0; i < a.bytes.length; i++){
+				if(a.bytes[i] != b.bytes[i])
+					eq = false;
+			}
+			return eq;
+		}
+	}
+	public boolean compare(GCSignal[] a, GCSignal[] b){
+		if(a.length != b.length)
+			return false;
+		boolean eq = true;
+		for(int i = 0; i < a.length; i++){
+			if(a[i] != b[i])
+				eq = false;
+		}
+		return eq;
+	}
 }

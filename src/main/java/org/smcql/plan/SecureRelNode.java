@@ -9,9 +9,9 @@ import org.apache.calcite.rel.logical.LogicalProject;
 import org.smcql.plan.operator.AttributeResolver;
 import org.smcql.plan.operator.Operator;
 import org.smcql.type.SecureRelRecordType;
-
-// decorator for calcite's RelNode
-// for attribute-level security policy inference 
+/**
+ * 用于属性级安全策略推断的calcite's RelNode 修饰器
+ */
 public class SecureRelNode implements Serializable {
 	transient RelNode baseNode;
 	Operator physicalNode; 

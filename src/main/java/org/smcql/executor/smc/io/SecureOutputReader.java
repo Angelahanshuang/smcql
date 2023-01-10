@@ -23,8 +23,11 @@ public class SecureOutputReader {
 	public static QueryTable assembleOutput(BasicSecureQueryTable alice, BasicSecureQueryTable bob, SecureRelRecordType schema) throws Exception {
 		GCSignal R = alice.R;
 		
-		if (schema == null)
+		if (schema == null){
+			System.out.println("[CODE]SecureOutputReader assembleOutput alice schema");
 			schema = alice.schema;
+		}
+		System.out.println("[CODE]SecureOutputReader assembleOutput schema:" + schema);
 		
 		assert(R != null);
 		

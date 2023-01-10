@@ -48,6 +48,11 @@ public class RecursiveCircuitOram<T> implements java.io.Serializable {
 		init(env, N, dataSize, 1<<6, 8, 3, 80);
 	}
 
+	@Override
+	public String toString(){
+		return String.format("RecursiveCircuitOram(%d)", -1);
+	} 
+
 	public void setInitialValue(int initial) {
 		clients.get(0).setInitialValue(initial);
 	}

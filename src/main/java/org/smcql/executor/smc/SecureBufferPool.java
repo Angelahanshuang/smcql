@@ -121,7 +121,7 @@ public class SecureBufferPool implements Serializable {
 			  found = false;
 		  
 		  
-		  logger.info("Secure buffer pool looking up key " + key + " found? " + found + " table " + record);
+		  //logger.info("Secure buffer pool looking up key " + key + " found? " + found + " table " + record);
 		  return record;
 	  }
 	  

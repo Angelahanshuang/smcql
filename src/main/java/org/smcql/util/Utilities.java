@@ -35,8 +35,49 @@ import org.smcql.type.SecureRelRecordType;
 
 
 public class Utilities {
-	
-	
+	//config
+	public static final boolean Isomerism = false;
+	//SYSCMD_PSI true: save all plain queries and do all ops together, false: regular process
+	public static final boolean SYSCMD_PSI_MPC = true;
+	public static final boolean PRINT_GENCODE = false;
+
+	public static String getPackageClassName(String fullname){
+		return fullname.substring(fullname.lastIndexOf(".") + 1);
+	}
+	public static String getSubPackageClassName(String fullname){
+		String name = getPackageClassName(fullname);
+		if(name.toLowerCase().equals("merge")){
+			String[] names = fullname.split("\\.");
+			return names[names.length - 2] + "." + names[names.length - 1];
+		}else{
+			return name;
+		}
+	}
+	public static String getOperatorChildrenPackageClassName(OperatorExecution op){
+		StringBuilder sb = new StringBuilder();
+		if(op.lhsChild == null){
+			sb.append("null");
+		}else{
+			sb.append(getPackageClassName(op.lhsChild.packageName));
+		}
+		sb.append(", ");
+		if(op.rhsChild == null){
+			sb.append("null");
+		}else{
+			sb.append(getPackageClassName(op.rhsChild.packageName));
+		}
+		return sb.toString();
+	}
+
+	public static String getFileName(String path){
+		if(path == null || path.isEmpty()){
+			return "";
+		}
+		if(path.indexOf("/") < 0){
+			return path;
+		}
+		return path.substring(path.lastIndexOf("/") + 1);
+	}
     
 	 public static String getSMCQLRoot() {
 	        String    root = System.getProperty("smcql.root"); // for remote systems
@@ -110,10 +151,9 @@ public class Utilities {
 
 
 		public static SecureRelRecordType getOutSchemaFromString(String sql) throws Exception {
+			System.out.println("[CODE]getOutSchemaFromString anonymous:\n" + sql);
 			SecureRelRoot relRoot = new SecureRelRoot("anonymous", sql);
-			
 			return relRoot.getPlanRoot().getSchema();
-			
 		}
 
 
@@ -242,4 +282,39 @@ public class Utilities {
 		return result;
 	}
 
+	public static boolean executeSh(String exesh) {
+        BufferedReader stdInput = null;
+        BufferedReader stdError = null;
+        try {
+            Process process = null;
+            String[] cmd = new String[]{"/bin/bash", "-c", exesh};
+            process = Runtime.getRuntime().exec(cmd);
+            String[] result = new String[2];
+            stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            while ((result[0] = stdInput.readLine()) != null) {
+                System.out.println(result[0]);
+            }
+            while ((result[1] = stdError.readLine()) != null) {
+                System.out.println(result[1]);
+            }
+            process.waitFor();
+            process.destroy();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (stdInput != null) {
+                    stdError.close();
+                }
+                if (stdError != null) {
+                    stdError.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 }

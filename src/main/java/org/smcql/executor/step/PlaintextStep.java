@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.calcite.util.ImmutableIntList;
 import org.smcql.codegen.CodeGenerator;
 import org.smcql.config.SystemConfiguration;
 import org.smcql.db.data.QueryTable;
@@ -26,6 +27,8 @@ public class PlaintextStep implements ExecutionStep, Serializable {
 	boolean visited = false;
 	String packageName = null;
 	OperatorExecution exec;
+	String workerId;
+	boolean executable = true;
 
 	public PlaintextStep(Operator op, RunConfig run, ExecutionStep child) throws Exception {
 		srcOperator = op;
@@ -54,12 +57,39 @@ public class PlaintextStep implements ExecutionStep, Serializable {
 		
 		exec.setSourceSQL(generate());
 	}
-	
+
+	@Override
+	public void setJoinId(List<String> joinId) {
+		exec.joinId = joinId;
+		System.out.println("[CODE]PlaintextStep joinId:" + exec.joinId +"\n");
+	}
+	@Override
+	public List<String> getJoinId() {
+		return exec.joinId;
+	}
+
 	public void addChild(ExecutionStep child) {
 		children.add(child);
 	}
 	
-	
+	@Override
+	public String getWorkerId(){
+		return workerId;
+	}
+	@Override
+	public void setWorkerId(String workerId){
+		this.workerId = workerId;
+	}
+
+	@Override
+	public boolean getExecutable(){
+		return executable;
+	}
+	public void setExecutable(boolean executable){
+		this.executable = executable;
+	}
+
+
 	@Override
 	public String generate() throws Exception {
 		return srcOperator.getPlainOperator().generate();
@@ -170,9 +200,9 @@ public class PlaintextStep implements ExecutionStep, Serializable {
 	public String printTree() {
 		return appendOperator(this, new String(), "");
 	}
-	
+
 	private String appendOperator(ExecutionStep step, String src, String linePrefix) {
-		src += linePrefix + step.getSourceOperator() + "\n";
+		src += linePrefix + step.getSourceOperator() + "(" + step.getSourceOperator().workerId + ")\n";
 		linePrefix += "    ";
 		for(ExecutionStep child : step.getChildren()) {
 			src = appendOperator(child, src, linePrefix);

@@ -19,14 +19,14 @@ public class SecureRelRoot {
 		SqlStatementParser parser = new SqlStatementParser();
 
 		baseRoot = parser.convertSqlToRelMinFields(sql);
-		baseRoot = parser.optimize(baseRoot); // optimized to represent in a fine granularity for more smc avoidance
+		baseRoot = parser.optimize(baseRoot); // 优化为以细粒度表示，以避免更多的smc optimized to represent in a fine granularity for more smc avoidance
 		
-		baseRoot = parser.trimFields(baseRoot); // use minimal set of fields to avoid triggering unnecessary SMC
+		baseRoot = parser.trimFields(baseRoot); // 使用最小的字段集以避免触发不必要的SMC use minimal set of fields to avoid triggering unnecessary SMC
 		
-		baseRoot = parser.mergeProjects(baseRoot); // drop any unnecessary steps in the plan
+		baseRoot = parser.mergeProjects(baseRoot); // 放弃计划中任何不必要的步骤 drop any unnecessary steps in the plan
 		
 		name = (queryName == null) ? SystemConfiguration.getInstance().getQueryName() : queryName.replaceAll("-", "_");
-		treeRoot = TreeBuilder.create(name, baseRoot);
+		treeRoot = TreeBuilder.create(name, baseRoot);//轻版本的查询规划器,采用逻辑RelNode树生成物理操作符树
 	}
 	
 	

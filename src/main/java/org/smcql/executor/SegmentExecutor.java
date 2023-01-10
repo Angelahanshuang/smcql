@@ -69,8 +69,8 @@ public class SegmentExecutor {
 			remotePath = "/tmp/smcql";
 		
 
-		String msg = "Initializing segment executor for " + aWorker + ", " + bWorker + " on " + aliceWorker.hostname + "," + bobWorker.hostname;
-		logger.info(msg);
+		//String msg = "Initializing segment executor for " + aWorker + ", " + bWorker + " on " + aliceWorker.hostname + "," + bobWorker.hostname;
+		//logger.info(msg);
 
 		cloud = CloudFactory.createCloud();
 		RemoteNode.at(cloud.node("**")).useSimpleRemoting();
@@ -113,12 +113,16 @@ public class SegmentExecutor {
 	public List<SecureQueryTable> runSecureSegment(ExecutionSegment segment) throws Exception {
 		return runSecure(segment);
 	}
-	
+	public List<SecureQueryTable> runSecureSegment(List<ExecutionSegment> segment) throws Exception {
+		return runSecure(segment);
+	}
+
 	private void initializeHost(WorkerConfiguration worker) throws Exception {
 		String host = worker.hostname;
 		String workerId = worker.workerId;
 		
 		ViNode cloudHost = cloud.node(workerId);
+		cloud.node(workerId).x(VX.PROCESS).addJvmArgs("-Xms512m", "-Xmx512m");
 		
 		 RemoteNodeProps.at(cloudHost).setRemoteHost(host);
 		
@@ -161,7 +165,7 @@ public class SegmentExecutor {
 
 	 
 	 public QueryTable runPlaintext(String workerId, String sql, SecureRelRecordType os) throws Exception {
-
+			System.out.println("[CODE]runPlaintext");
 			ViNode node = cloud.node(workerId);
 			final SecureRelRecordType outSchema = (os == null) ?  Utilities.getOutSchemaFromString(sql) : os;
 			
@@ -221,7 +225,31 @@ public class SegmentExecutor {
 				}
 		 });
 	 }
-	 
+	 public List<SecureQueryTable> runSecure(List<ExecutionSegment> segments) {
+		List<SecureQueryTable> result = cloud.node("**").massExec(new Callable<SecureQueryTable>() {
+			@Override
+			public SecureQueryTable call() throws Exception {
+				Party party = (System.getProperty("party").equals("gen")) ? Party.Alice : Party.Bob;
+				String workerId = System.getProperty("workerId");
+				SecureQueryTable smcOutput = null;
+				for(ExecutionSegment segment: segments){
+					segment.party = party;
+					if(segment.workerId.equals(workerId)){
+						segment.sliceComplementSQL = segment.sliceComplementSQL;
+						RunnableSegment<GCSignal> runner = new RunnableSegment<GCSignal>(segment);
+						if(party == Party.Alice)
+							Thread.sleep(200); // eva must start first
+						System.out.println("runSecure for " + workerId + (party == Party.Bob ? "(Bob)" : "(Alice)"));
+						Thread execThread = runner.runIt();
+						execThread.join();
+						smcOutput = runner.getOutput(); 
+					}
+				}
+				return smcOutput;
+			}
+		});
+		return result;
+	}	 
 	 public List<SecureQueryTable> runSecure(ExecutionSegment segment) {
 		 String sql = segment.sliceComplementSQL;
 			
@@ -230,9 +258,6 @@ public class SegmentExecutor {
 				public SecureQueryTable call() throws Exception {
 					Party party = (System.getProperty("party").equals("gen")) ? Party.Alice : Party.Bob;
 					String workerId = System.getProperty("workerId");
-					
-					
-					
 					segment.party = party;
 					segment.workerId = workerId;
 					segment.sliceComplementSQL = sql;
@@ -240,13 +265,11 @@ public class SegmentExecutor {
 					RunnableSegment<GCSignal> runner = new RunnableSegment<GCSignal>(segment);
 					if(party == Party.Alice)
 						Thread.sleep(200); // eva must start first
-					
-					
+					System.out.println("runSecure for " + workerId + (party == Party.Bob ? "(Bob)" : "(Alice)"));
 					Thread execThread = runner.runIt();
 					execThread.join();
 	
 					SecureQueryTable smcOutput = runner.getOutput(); 
-				
 					return smcOutput;
 				}
 			});

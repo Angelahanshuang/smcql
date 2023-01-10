@@ -3,7 +3,8 @@ codegen-target=bin
 data-providers=conf/connections/localhosts
 
 #log information
-log-level=off
+log-level=info
+local-log-file=logs/smcql.log
 
 #query planner information
 sliced-execution=false
@@ -12,8 +13,8 @@ semijoin-execution=false
 
 #postgres credentials and info
 [psql]
-host=localhost
+host=192.168.0.207
 port=5432
 db=smcql_testDB
 user=smcql
-password=<insert psql password>
+password=<rongan2022>

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.apache.calcite.rel.RelNode;
+import org.apache.calcite.rel.core.JoinInfo;
 import org.apache.calcite.rel.core.JoinRelType;
 import org.apache.calcite.rel.logical.LogicalAggregate;
 import org.apache.calcite.rel.logical.LogicalFilter;
@@ -16,6 +17,7 @@ import org.apache.calcite.rex.RexInputRef;
 import org.apache.calcite.rex.RexNode;
 import org.apache.calcite.rex.RexUtil;
 import org.apache.calcite.sql.SqlKind;
+import org.apache.calcite.util.ImmutableIntList;
 import org.smcql.executor.config.RunConfig.ExecutionMode;
 import org.smcql.plan.SecureRelNode;
 import org.smcql.type.SecureRelDataTypeField;
@@ -25,10 +27,28 @@ import org.smcql.util.Utilities;
 
 public class Join extends Operator {
 
-	
+	public List<String> joinId = null;
 	public Join(String name, SecureRelNode src, Operator ...children ) throws Exception {
 		super(name, src, children);
-		
+		LogicalJoin join = (LogicalJoin)src.getRelNode();
+		System.out.println("[CODE]OperatorFactory::get node join condition===[" + join.getCondition() +"]===");
+		System.out.println("[CODE]OperatorFactory::get node join schema:" + src.getSchema());
+		JoinInfo ji = join.analyzeCondition();
+		if(ji != null){
+			List<ImmutableIntList> joins = ji.keys();
+			if(ji.isEqui()){
+				System.out.println("[CODE]OperatorFactory::get node equi-join keys:" + joins);
+			}else{
+				System.out.println("[CODE]OperatorFactory::get node join keys:" + joins);
+			}
+			if(joins != null && joins.size() == 2){
+				System.out.println("[CODE]OperatorFactory::get node join LHS keys:" + joins.get(0));
+				System.out.println("[CODE]OperatorFactory::get node join RHS keys:" + joins.get(1));
+				joinId = new ArrayList<>();
+				joinId.add(joins.get(0).toString());
+				joinId.add(joins.get(1).toString());
+			}
+		}
 	}
 	
 	

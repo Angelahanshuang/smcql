@@ -33,7 +33,7 @@ import org.smcql.executor.config.WorkerConfiguration;
 import org.smcql.executor.smc.OperatorExecution;
 //import org.smcql.executor.smc.OperatorExecution;
 import org.smcql.util.Utilities;
-
+/** 根据配置文件获取了诚实代理的地址、初始化logger、（初始化了calcite的connect、schema、parser）*/
 public class SystemConfiguration {
 	
 	public static final SqlDialect DIALECT = SqlDialect.DatabaseProduct.POSTGRESQL.getDialect();
@@ -77,8 +77,9 @@ public class SystemConfiguration {
 		if(configFile == null) 
 			configFile = Utilities.getSMCQLRoot() + "/conf/setup";
 		
-		File f = new File(configFile); // may not always exist in remote invocations
+		File f = new File(configFile); // 可能并不总是存在于远程调用中 may not always exist in remote invocations
 		if(f.exists()) {
+			//List<String> parameters = Utilities.readFile("D:\\IdeaProjects\\smcql\\conf\\setup.localhost");
 			List<String> parameters = Utilities.readFile(configFile);
 			parseConfiguration(parameters);
 			

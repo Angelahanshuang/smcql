@@ -6,6 +6,7 @@ import org.smcql.config.SystemConfiguration;
 import org.smcql.executor.config.RunConfig.ExecutionMode;
 import org.smcql.plan.operator.Operator;
 import org.smcql.util.CodeGenUtils;
+import org.smcql.util.Utilities;
 
 
 public class SecureDistinct extends SecureOperator{
@@ -27,7 +28,8 @@ public class SecureDistinct extends SecureOperator{
 		else {
 			generatedCode = CodeGenUtils.generateFromTemplate("distinct/simple.txt", variables);
 		}
-
+		if(Utilities.PRINT_GENCODE)
+			System.out.println("[GENCODE]SecureDistinct generate:\n" + generatedCode);
 		return generatedCode;
 	}
 

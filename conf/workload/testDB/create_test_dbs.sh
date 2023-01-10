@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#run from smcql home, which contains src/ 
+#run from smcql home, which contains src/
+## 本脚本创建了smcql_testDB、smcql_testDB_site1、smcql_testDB_site2三个数据库，并插入了测试数据
 path=$(pwd)
 echo "Using test data from $path"
 

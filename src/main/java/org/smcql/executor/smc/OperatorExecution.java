@@ -1,11 +1,16 @@
 package org.smcql.executor.smc;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.apache.calcite.util.ImmutableIntList;
+import org.smcql.codegen.smc.operator.SecureJoin;
 import org.smcql.config.SystemConfiguration;
 import org.smcql.type.SecureRelRecordType;
 import org.smcql.executor.step.ExecutionStep;
 import org.smcql.executor.step.PlaintextStep;
 import org.smcql.executor.step.SecureStep;
+import org.smcql.plan.operator.Join;
 import org.smcql.util.Utilities;
 
 import com.oblivm.backend.flexsc.Party;
@@ -13,7 +18,7 @@ import com.oblivm.backend.gc.GCSignal;
 import com.oblivm.backend.oram.SecureArray;
 
 
-// basically a stripped down version of ExecutionStep for serialization
+// 基本上是一个精简版的 ExectionStep，用于序列化
 public class OperatorExecution implements Comparable<OperatorExecution>, Serializable {
 
 	/**
@@ -26,11 +31,13 @@ public class OperatorExecution implements Comparable<OperatorExecution>, Seriali
 	public OperatorExecution lhsChild, rhsChild;  // may be root of another segment
 	public ExecutionSegment parentSegment = null; // pointer to segment for SMCConfig 
 	public byte[] byteCode; // compiled .class for this step
+	public boolean executable = true;
 
 	 // for merge case
 	String sourceSQL = null;
 	public transient SecureArray<GCSignal> output; // optional - for passing around data w/in segment
-	
+	public List<String> joinId = null;
+	public boolean isJoin = false;
 	
 	public OperatorExecution() {
 		
@@ -40,10 +47,14 @@ public class OperatorExecution implements Comparable<OperatorExecution>, Seriali
 	public OperatorExecution(SecureStep s) {
 		packageName = s.getPackageName();
 		outSchema = s.getSchema(); //change this
-		
+		executable = s.getExecutable();
 		
 		lhsChild = getChild(s, 0);
 		rhsChild = getChild(s, 1);
+
+		if(s.getSourceOperator() instanceof Join){
+			isJoin = true;
+		}			
 		
 		if(lhsChild != null) 
 			lhsChild.parent = this;
@@ -63,7 +74,7 @@ public class OperatorExecution implements Comparable<OperatorExecution>, Seriali
 	public OperatorExecution(PlaintextStep s) {
 		packageName = s.getPackageName();
 		outSchema = s.getSchema();
-		
+		executable = s.getExecutable();
 		
 		lhsChild = getChild(s, 0);
 		rhsChild = getChild(s, 1);
@@ -74,7 +85,6 @@ public class OperatorExecution implements Comparable<OperatorExecution>, Seriali
 		if(rhsChild != null) 
 			rhsChild.parent = this;
 	}
-
 
 	private OperatorExecution getChild(ExecutionStep src, int idx) {
 		ExecutionStep e = src.getChild(idx);

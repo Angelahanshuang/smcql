@@ -9,8 +9,10 @@ public class Server extends Network {
 
 	public void listen(int port) {
 		try {
+			System.out.println("to accept");
 			serverSock = new ServerSocket(port);
 			sock = serverSock.accept(); // wait for client to connect
+			System.out.println("accepted");
 
 			os = new BufferedOutputStream(sock.getOutputStream());
 			is = new BufferedInputStream(sock.getInputStream());

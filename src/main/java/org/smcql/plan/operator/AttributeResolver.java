@@ -194,7 +194,7 @@ public class AttributeResolver {
 	}
 
 
-	// straight copy of permissions, accept any new aliases
+	// 直接复制权限，接受任何新别名。straight copy of permissions, accept any new aliases
 	public static SecureRelRecordType copySchema(SecureRelNode aNode) {
 		SecureRelRecordType srcSchema = aNode.getChild(0).getSchema();
 		RelRecordType dstRecord = (RelRecordType) aNode.getRelNode().getRowType();

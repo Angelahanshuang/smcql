@@ -12,7 +12,7 @@ public class TimestampField extends Field implements Serializable  {
 	public Timestamp time;
 	
 	
-	TimestampField(SecureRelDataTypeField attr, Timestamp timestamp) {
+	public TimestampField(SecureRelDataTypeField attr, Timestamp timestamp) {
 		super(attr);
 		time = timestamp;
 		timestamp.getTime();

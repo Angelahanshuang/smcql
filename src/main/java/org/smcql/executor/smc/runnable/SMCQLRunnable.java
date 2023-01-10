@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
+import org.smcql.config.SystemConfiguration;
 import org.smcql.db.data.Tuple;
 import org.smcql.executor.smc.ExecutionSegment;
 import org.smcql.executor.smc.OperatorExecution;
@@ -20,7 +22,6 @@ import com.oblivm.backend.util.Utils;
 
 
 public class SMCQLRunnable {
-	
 	// just obliv-needed stuff that is different for gen and eva
 	public static class Generator<T> extends GenRunnable<T> implements java.io.Serializable, SMCRunnable {
 		/**
@@ -43,6 +44,7 @@ public class SMCQLRunnable {
 			runSpec = spec;
 			this.m = runSpec.runConf.smcMode;
 			this.port = runSpec.runConf.port;
+			System.out.println("Generator(Alice) impl");
 			impl = new SMCQLRunnableImpl<T>(runSpec, this);
 			
 		}
@@ -72,7 +74,8 @@ public class SMCQLRunnable {
 		
 		// walk exec segment tree, instantiate all classes and prepare any plaintext inputs
 		@Override
-		public void prepareInput(CompEnv<T> env) { 			
+		public void prepareInput(CompEnv<T> env) { 		
+			System.out.println("[CODE]Generator prepareInput");	
 		}
 		
 
@@ -222,7 +225,7 @@ public class SMCQLRunnable {
 			this.m = runSpec.runConf.smcMode;
 			this.port = runSpec.runConf.port;
 			this.host =  runSpec.runConf.host;
-	
+			System.out.println("Evaluator(Bob) impl");
 			impl = new SMCQLRunnableImpl<T>(runSpec, this);
 		}
 
@@ -231,7 +234,8 @@ public class SMCQLRunnable {
 		// walk exec segment tree, instantiate all classes and prepare any plaintext inputs
 		@Override
 		public void prepareInput(CompEnv<T> env) { 
-		// pushing this all down to secureCompute to handle multiple operators
+			// pushing this all down to secureCompute to handle multiple operators
+			System.out.println("[CODE]Evaluator prepareInput");
 		}
 		
 

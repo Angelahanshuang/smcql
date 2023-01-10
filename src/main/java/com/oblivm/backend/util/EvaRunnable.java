@@ -19,7 +19,7 @@ public abstract  class EvaRunnable<T> extends com.oblivm.backend.network.Client 
 	protected int port;
 	protected String host;
 	protected String[] args;
-	public boolean verbose = false;
+	public boolean verbose = true;
 
 	public void setParameter(Mode m, String host, int port, String[] args){
 		this.m = m;
@@ -41,7 +41,7 @@ public abstract  class EvaRunnable<T> extends com.oblivm.backend.network.Client 
 			double e = 0;
 			try {
 				if(verbose)
-					System.out.println("connecting");
+					System.out.println("connecting " + host + ":" + String.valueOf(port));
 	            connect(host, port);
 	            if(verbose)
 	                System.out.println("connected");
@@ -52,10 +52,13 @@ public abstract  class EvaRunnable<T> extends com.oblivm.backend.network.Client 
 				Flag.sw.startTotal();
 
 	            s = System.nanoTime();
+				System.out.println("[CODE]EvaRunnable prepareOutput");
 	            prepareInput(env);
 	            os.flush();
+				System.out.println("[CODE]EvaRunnable secureCompute");
 	            secureCompute(env);
 	            os.flush();
+				System.out.println("[CODE]EvaRunnable prepareOutput");
 	            result = prepareOutput(env);
 	            os.flush();
 	            Flag.sw.stopTotal();
