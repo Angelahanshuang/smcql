@@ -28,14 +28,14 @@ import org.smcql.util.CodeGenUtils;
 import org.smcql.util.Utilities;
 
 
-// 用于RelRecordType的装饰器，使用安全策略注释
+// decorator for RelRecordType, annotate with a security policy
 public class SecureRelRecordType implements Serializable {	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5544214600670533850L;
 	
-	// 所有属性的最大安全策略
+	// maximum policy over all attributes
 	SecurityPolicy policy = SecurityPolicy.Private;
     RelRecordType baseType;
     
