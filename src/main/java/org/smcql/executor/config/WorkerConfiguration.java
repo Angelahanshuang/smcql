@@ -56,8 +56,9 @@ public class WorkerConfiguration  {
 		dbId = Integer.parseInt(parsed[3]);
 
 		SystemConfiguration globalConf = SystemConfiguration.getInstance();
-		user = globalConf.getProperty("psql-user");
-		password = globalConf.getProperty("psql-password");
+		String dbType = globalConf.getProperty("db-current");//TODO tians 支持不同数据库
+		user = globalConf.getProperty(dbType + "-user");
+		password = globalConf.getProperty(dbType + "-password");
 
 	}
 
@@ -68,8 +69,9 @@ public class WorkerConfiguration  {
 
 	public Connection getDbConnection() throws SQLException, ClassNotFoundException {
 		if(dbConnection == null) {
-			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://" + hostname + ":" + dbPort + "/" + dbName;
+			//Class.forName("org.postgresql.Driver");
+			String dbType = SystemConfiguration.DIALECT.getDatabaseProduct().name().toLowerCase();
+			String url = "jdbc:" + dbType + "://" + hostname + ":" + dbPort + "/" + dbName;
 			Properties props = new Properties();
 			System.out.println(url + " user:" + user);
 			props.setProperty("user", user);

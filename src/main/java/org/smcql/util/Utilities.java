@@ -40,6 +40,9 @@ public class Utilities {
 	//SYSCMD_PSI true: save all plain queries and do all ops together, false: regular process
 	public static final boolean SYSCMD_PSI_MPC = true;
 	public static final boolean PRINT_GENCODE = false;
+	public static final boolean PRINT_PLAINTABLE = true;
+	public static final boolean PLAIN_FILTER_EXPR = true;
+	public static final boolean DEBUG_DECODE = true;
 
 	public static String getPackageClassName(String fullname){
 		return fullname.substring(fullname.lastIndexOf(".") + 1);
@@ -89,7 +92,9 @@ public class Utilities {
 	        // fall back to local path
 	        URL location = Utilities.class.getProtectionDomain().getCodeSource().getLocation();
 	        String path = location.getFile();
-	       
+		    File directory = new File("");
+		    String absolutePath = directory.getAbsolutePath();
+
 	        // chop off trailing "/bin/src/"
 	        if(path.endsWith("src/")) { // ant build
 	            path = path.substring(0, path.length()-"src/".length());
@@ -105,7 +110,7 @@ public class Utilities {
 	        if(path.endsWith("target/smcql-open-source-0.5.jar"))
 	        	path = path.substring(0, path.length() - "/target/smcql-open-source-0.5.jar".length());
 	        
-	        return path;
+	        return absolutePath;
 	    }	
 	 
 	 

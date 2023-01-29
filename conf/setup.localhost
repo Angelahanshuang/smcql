@@ -11,10 +11,30 @@ sliced-execution=false
 slice-parallelism=2
 semijoin-execution=false
 
+#当前使用哪个数据库做为诚实代理读取共享schema的数据库，see@SqlDialect
+[db]
+current=mysql
+
 #postgres credentials and info
-[psql]
+[postgres]
 host=192.168.0.207
 port=5432
 db=smcql_testDB
 user=smcql
 password=<rongan2022>
+
+#mysql credentials and info
+[mysql]
+host=192.168.0.6
+port=3306
+db=tpc_ds_test
+user=root
+password=123.com
+
+#sqlserver credentials and info
+[sqlserver]
+host=192.168.0.207
+port=1433
+db=tpc_ds_test
+user=sa
+password=Rongan@2022
